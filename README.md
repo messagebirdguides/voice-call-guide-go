@@ -77,7 +77,14 @@ The SDK has a `voice` library that allows you to initiate a call using MessageBi
             nil,
         )
         if err != nil {
-            log.Println(err)
+            switch errResp := err.(type) {
+            case messagebird.ErrorResponse:
+                for _, mbError := range errResp.Errors {
+                    fmt.Printf("Error: %#v\n", mbError)
+                }
+            }
+
+            return
         }
         // We're logging call for development purposes. You can safely discard this variable in production.
         log.Println(call)
@@ -91,6 +98,8 @@ Here, we're calling `voice.InitiateCall()` with these parameters:
 - `destination`: The "destination" of the call, which is a phone number written in international format including its country code. For example, "+319876543210".
 - `callflow`: A call flow object that describes to the MessageBird servers the events that should occur during a call.
 - `nil`: Optional attributes that you can specify for this phone call. Here, we're setting it as `nil` because we have no additional attributes to add. You can find more information about these optional attributes in the [Voice Calling API Reference](https://developers.messagebird.com/docs/voice-calling#calls).
+
+We're handing any errors returned by the MessageBird REST API by unpacking the JSON response and logging it.
 
 Now that we've got `voice.InitiateCall()` stubbed out, we can define these parameters. Add these lines of code just on top of the `voice.InitiateCall()` block:
 
