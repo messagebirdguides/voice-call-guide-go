@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/messagebird/go-rest-api"
@@ -31,7 +32,14 @@ func main() {
 		nil,
 	)
 	if err != nil {
-		log.Println(err)
+		switch errResp := err.(type) {
+		case messagebird.ErrorResponse:
+			for _, mbError := range errResp.Errors {
+				fmt.Printf("Error: %#v\n", mbError)
+			}
+		}
+
+		return
 	}
 	// We're logging call for development purposes. You can safely discard this variable in production.
 	log.Println(call)
